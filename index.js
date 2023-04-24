@@ -1,13 +1,17 @@
 import express from "express";
 import mongoose from "mongoose";
+import multer from "multer";
 
-import { registerValidation, loginValidation } from "./validations/auth.js";
-import { postCreateValidation } from "./validations/post.js";
+import {
+  registerValidation,
+  loginValidation,
+  postCreateValidation,
+  postUpdateValidation,
+} from "./validations/index.js";
 
-import checkAuth from "./utils/checkAuth.js";
+import { handleValidationError, checkAuth } from "./utils/index.js";
 
-import * as UserController from "./controllers/UserController.js";
-import * as PostController from "./controllers/PostController.js";
+import { UserController, PostController } from "./controllers/index.js";
 
 //* Подключение к БД MongoDB
 mongoose
@@ -19,18 +23,62 @@ mongoose
 
 const app = express();
 
-//* Парсинг входящих данных
+//* Парсинг входящих данных в json
 app.use(express.json());
 
-app.post("/auth/login", loginValidation, UserController.login);
-app.post("/auth/register", registerValidation, UserController.register);
+app.use("/uploads", express.static("uploads"));
+
+const storage = multer.diskStorage({
+  destination: (_, __, cb) => {
+    cb(null, "uploads");
+  },
+  filename: (_, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({ storage });
+
+//? Запросы на авторизация
+app.post(
+  "/auth/login",
+  loginValidation,
+  handleValidationError,
+  UserController.login
+);
+app.post(
+  "/auth/register",
+  registerValidation,
+  handleValidationError,
+  UserController.register
+);
 app.get("/auth/getprofile", checkAuth, UserController.getProfile);
 
-app.post("/posts", checkAuth, postCreateValidation, PostController.create);
-app.get("/posts", checkAuth, PostController.getAll);
-app.get("/posts/:id", checkAuth, PostController.getOne);
-app.delete("/posts", checkAuth, PostController.remove);
-/* app.get("/posts/:id", PostController.getPost); */
+//? Запросы к постам
+app.get("/posts", PostController.getAll);
+app.get("/posts/:id", PostController.getOne);
+app.post(
+  "/posts",
+  checkAuth,
+  postCreateValidation,
+  handleValidationError,
+  PostController.create
+);
+app.delete("/posts", checkAuth, PostController.removeAll);
+app.delete("/posts/:id", checkAuth, PostController.removeOne);
+app.patch(
+  "/posts/:id",
+  checkAuth,
+  postUpdateValidation,
+  handleValidationError,
+  PostController.update
+);
+
+app.post("/upload", checkAuth, upload.single("image"), (req, res) => {
+  res.json({
+    url: `/uploads/${req.file.originalname}`,
+  });
+});
 
 app.listen(4444, (err) => {
   if (err) {
