@@ -30,7 +30,7 @@ app.use(express.json());
 app.use(
   cors({
     credentials: true,
-    origin: process.env.PORT,
+    origin: "https://block-front-6wrepblq4-1doler.vercel.app/",
   })
 );
 
