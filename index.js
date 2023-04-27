@@ -16,9 +16,7 @@ import { UserController, PostController } from "./controllers/index.js";
 
 //* Подключение к БД MongoDB
 mongoose
-  .connect(
-    "mongodb+srv://admin:pas123@blog.rqgtu1g.mongodb.net/blog?retryWrites=true&w=majority"
-  )
+  .connect(process.env.MONGODB_URI)
   .then(() => console.log("bd ok"))
   .catch((err) => console.log("err", err));
 
