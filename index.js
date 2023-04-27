@@ -16,7 +16,9 @@ import { UserController, PostController } from "./controllers/index.js";
 
 //* Подключение к БД MongoDB
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(
+    "mongodb+srv://admin:pas123@blog.rqgtu1g.mongodb.net/blog?retryWrites=true&w=majority"
+  )
   .then(() => console.log("bd ok"))
   .catch((err) => console.log("err", err));
 
@@ -28,7 +30,7 @@ app.use(express.json());
 app.use(
   cors({
     credentials: true,
-    origin: "http://localhost:3000",
+    origin: "*",
   })
 );
 
@@ -44,6 +46,10 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+
+app.get("/", (req, res) => {
+  res.send("fsadfasdfas");
+});
 
 //? Запросы на авторизация
 app.post(
@@ -87,7 +93,7 @@ app.post("/upload", checkAuth, upload.single("image"), (req, res) => {
   });
 });
 
-app.listen(4444, (err) => {
+app.listen(process.env.PORT || 4444, (err) => {
   if (err) {
     return console.log(err);
   }
