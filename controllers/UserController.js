@@ -1,4 +1,5 @@
 import { validationResult } from "express-validator";
+import cookie from "cookie";
 import bcrypt from "bcrypt";
 import UserModel from "../models/User.js";
 import jwt from "jsonwebtoken";
@@ -25,7 +26,12 @@ export const login = async (req, res) => {
 
     const token = jwt.sign({ _id: user._id }, "status", { expiresIn: "30d" });
     const { passwordHash, ...userData } = user._doc;
-    res.status(400).json({
+
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 900000),
+      httpOnly: true,
+    });
+    res.status(200).json({
       message: "Вы успешно авторизовались",
       userData,
       token,
@@ -74,7 +80,10 @@ export const register = async (req, res) => {
         expiresIn: "30d",
       }
     );
-
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 900000),
+      httpOnly: true,
+    });
     const { passwordHash, ...userData } = user._doc;
 
     res.json({
@@ -93,7 +102,7 @@ export const register = async (req, res) => {
 export const getProfile = async (req, res) => {
   try {
     const user = await UserModel.findById(req.userId);
-
+    console.log("user ", user);
     if (!user) {
       return res.status(403).json({
         message: "Такого пользователя нет",

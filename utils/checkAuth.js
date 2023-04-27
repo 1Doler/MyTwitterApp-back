@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
 export default (req, res, next) => {
-  const token = (req.headers.authorization || "").replace(/Bearer\s?/, "");
+  const token = (req.headers.cookie || "").replace(/token=\s?/, "");
   if (!token) {
     return res.status(403).json({
       message: "Нет доступа",

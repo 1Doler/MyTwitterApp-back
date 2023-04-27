@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import multer from "multer";
+import cors from "cors";
 
 import {
   registerValidation,
@@ -25,6 +26,13 @@ const app = express();
 
 //* Парсинг входящих данных в json
 app.use(express.json());
+
+app.use(
+  cors({
+    credentials: true,
+    origin: "http://localhost:3000",
+  })
+);
 
 app.use("/uploads", express.static("uploads"));
 
@@ -56,6 +64,7 @@ app.get("/auth/getprofile", checkAuth, UserController.getProfile);
 
 //? Запросы к постам
 app.get("/posts", PostController.getAll);
+app.get("/posts/tags", PostController.getLastTags);
 app.get("/posts/:id", PostController.getOne);
 app.post(
   "/posts",

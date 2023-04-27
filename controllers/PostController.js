@@ -22,9 +22,31 @@ export const create = async (req, res) => {
 };
 export const getAll = async (req, res) => {
   try {
-    const posts = await PostModel.find().populate("user").exec();
+    const typeSort = req.query.sort;
+    const tags = req.query.tags;
+    const sort = typeSort === "new" ? { createdAt: -1 } : { viewsCount: -1 };
+    const posts = await PostModel.find(tags ? { tags } : null)
+      .sort(sort)
+      .populate("user")
+      .exec();
 
     res.status(200).json(posts);
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).json({
+      message: "Не удалось получить посты",
+    });
+  }
+};
+export const getLastTags = async (req, res) => {
+  try {
+    const posts = await PostModel.find().limit(5).exec();
+    const tags = posts
+      .map((obj) => obj.tags)
+      .flat()
+      .slice(0, 5);
+    res.json(tags);
   } catch (err) {
     console.log(err);
 
@@ -92,7 +114,7 @@ export const removeOne = async (req, res) => {
         });
       }
 
-      return res.json({ success: true });
+      return res.json({ success: true, _id: postId });
     });
   } catch (err) {
     console.log(err);
@@ -105,14 +127,14 @@ export const removeOne = async (req, res) => {
 export const update = async (req, res) => {
   try {
     const postId = req.params.id;
-
-    await PostModel.findByIdAndUpdate(
+    await PostModel.findOneAndUpdate(
       {
         _id: postId,
       },
       {
         title: req.body.title,
         text: req.body.text,
+        tags: req.body.tags,
         imageUrl: req.body.imageUrl,
       }
     );
