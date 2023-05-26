@@ -30,11 +30,14 @@ app.use(express.json());
 app.use(
   cors({
     credentials: true,
-    origin: "*",
+    origin: "https://blog-front-lilac.vercel.app",
   })
 );
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "https://blog-front-lilac.vercel.app"
+  );
   res.removeHeader("x-powered-by");
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -66,6 +69,7 @@ app.get("/", (req, res) => {
 //? Запросы на авторизация
 app.post(
   "/auth/login",
+  cors(),
   loginValidation,
   handleValidationError,
   UserController.login
