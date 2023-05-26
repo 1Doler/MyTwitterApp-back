@@ -37,7 +37,7 @@ app.use((req, res, next) => {
   //allow access to current url. work for https as well
   cors({
     credentials: true,
-    origin: "https://block-front-6wrepblq4-1doler.vercel.app/",
+    origin: "https://blog-back-production-2b18.up.railway.app/",
   });
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.removeHeader("x-powered-by");
