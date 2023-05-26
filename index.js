@@ -27,12 +27,12 @@ const app = express();
 //* Парсинг входящих данных в json
 app.use(express.json());
 
-/* app.use(
+app.use(
   cors({
     credentials: true,
-    origin: "https://block-front-6wrepblq4-1doler.vercel.app/",
+    origin: "*",
   })
-); */
+);
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.removeHeader("x-powered-by");
