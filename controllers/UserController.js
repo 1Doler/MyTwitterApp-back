@@ -28,8 +28,10 @@ export const login = async (req, res) => {
     const { passwordHash, ...userData } = user._doc;
 
     res.cookie("token", token, {
+      sameSite: "none",
+      secure: true,
       expires: new Date(Date.now() + 900000),
-      httpOnly: true,
+      httpOnly: false,
     });
     res.status(200).json({
       message: "Вы успешно авторизовались",
@@ -37,8 +39,6 @@ export const login = async (req, res) => {
       token,
     });
   } catch (err) {
-    console.log(err);
-
     res.status(500).json({
       message: "Не удалось авторизоваться",
     });
@@ -91,8 +91,6 @@ export const register = async (req, res) => {
       token,
     });
   } catch (err) {
-    console.log(err);
-
     res.status(500).json({
       message: "Не удалось зарегистрироваться",
     });
@@ -102,7 +100,6 @@ export const register = async (req, res) => {
 export const getProfile = async (req, res) => {
   try {
     const user = await UserModel.findById(req.userId);
-    console.log("user ", user);
     if (!user) {
       return res.status(403).json({
         message: "Такого пользователя нет",
@@ -117,6 +114,24 @@ export const getProfile = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       message: "Вы не авторизованы",
+    });
+  }
+};
+export const updateProfile = async (req, res) => {
+  try {
+    await UserModel.findOneAndUpdate(
+      { _id: req.body.userId },
+      {
+        fullName: req.body.fullName,
+        avatarUrl: req.body.avatarUrl,
+      }
+    );
+    res.send({
+      success: true,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Не удалось обновить данные",
     });
   }
 };
