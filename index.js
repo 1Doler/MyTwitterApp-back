@@ -12,7 +12,11 @@ import {
 
 import { handleValidationError, checkAuth } from "./utils/index.js";
 
-import { UserController, PostController } from "./controllers/index.js";
+import {
+  UserController,
+  PostController,
+  CommentController,
+} from "./controllers/index.js";
 
 //* Подключение к БД MongoDB
 mongoose
@@ -20,17 +24,18 @@ mongoose
     "mongodb+srv://admin:pas123@blog.rqgtu1g.mongodb.net/blog?retryWrites=true&w=majority"
   )
   .then(() => console.log("bd ok"))
-  .catch((err) => console.log("err", err));
+  .catch(err => console.log("err", err));
 
 const app = express();
 
 //* Парсинг входящих данных в json
 app.use(express.json());
 
+app.use("/uploads", express.static("uploads"));
 app.use(
   cors({
     credentials: true,
-    origin: "https://blog-front-lilac.vercel.app",
+    origin: true,
   })
 );
 app.use((req, res, next) => {
@@ -48,8 +53,6 @@ app.use((req, res, next) => {
 
   next();
 });
-
-app.use("/uploads", express.static("uploads"));
 
 const storage = multer.diskStorage({
   destination: (_, __, cb) => {
@@ -81,6 +84,12 @@ app.post(
   UserController.register
 );
 app.get("/auth/getprofile", checkAuth, UserController.getProfile);
+app.patch("/auth/update", checkAuth, UserController.updateProfile);
+
+app.get("/comment", CommentController.allComment);
+app.get("/comment/:id", CommentController.getPostComment);
+app.post("/comment/:id", CommentController.addComment);
+app.delete("/comment", CommentController.removeComments);
 
 //? Запросы к постам
 app.get("/posts", PostController.getAll);
@@ -102,6 +111,7 @@ app.patch(
   handleValidationError,
   PostController.update
 );
+app.patch("/updateall", PostController.updateAll);
 
 app.post("/upload", checkAuth, upload.single("image"), (req, res) => {
   res.json({
@@ -109,7 +119,7 @@ app.post("/upload", checkAuth, upload.single("image"), (req, res) => {
   });
 });
 
-app.listen(process.env.PORT || 4444, (err) => {
+app.listen(process.env.PORT || 4444, err => {
   if (err) {
     return console.log(err);
   }

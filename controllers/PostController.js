@@ -13,8 +13,6 @@ export const create = async (req, res) => {
 
     res.json(post);
   } catch (err) {
-    console.log(err);
-
     res.status(500).json({
       message: "Не удалось создать пост",
     });
@@ -32,8 +30,6 @@ export const getAll = async (req, res) => {
 
     res.status(200).json(posts);
   } catch (err) {
-    console.log(err);
-
     res.status(500).json({
       message: "Не удалось получить посты",
     });
@@ -43,13 +39,11 @@ export const getLastTags = async (req, res) => {
   try {
     const posts = await PostModel.find().limit(5).exec();
     const tags = posts
-      .map((obj) => obj.tags)
+      .map(obj => obj.tags)
       .flat()
       .slice(0, 5);
     res.json(tags);
   } catch (err) {
-    console.log(err);
-
     res.status(500).json({
       message: "Не удалось получить посты",
     });
@@ -74,17 +68,13 @@ export const getOne = async (req, res) => {
     )
       .populate("user")
       .exec()
-      .then((doc) => res.json(doc))
-      .catch((err) => {
-        console.log(err);
-
+      .then(doc => res.json(doc))
+      .catch(err => {
         res.status(404).json({
           message: "Не такого поста",
         });
       });
   } catch (err) {
-    console.log(err);
-
     res.status(500).json({
       message: "Не1 удалось получить пост",
     });
@@ -96,8 +86,6 @@ export const removeAll = async (req, res) => {
 
     res.status(200).json(posts);
   } catch (err) {
-    console.log(err);
-
     res.status(500).json({
       message: "Не удалось удалить посты",
     });
@@ -107,7 +95,7 @@ export const removeOne = async (req, res) => {
   try {
     const postId = req.params.id;
 
-    PostModel.findByIdAndDelete(postId).then((doc) => {
+    PostModel.findByIdAndDelete(postId).then(doc => {
       if (!doc) {
         return res.status(404).json({
           message: "Статья не найдена",
@@ -117,8 +105,6 @@ export const removeOne = async (req, res) => {
       return res.json({ success: true, _id: postId });
     });
   } catch (err) {
-    console.log(err);
-
     res.status(500).json({
       message: "Не удалось удалить пост",
     });
@@ -143,8 +129,24 @@ export const update = async (req, res) => {
       success: true,
     });
   } catch (err) {
-    console.log(err);
+    res.status(500).json({
+      message: "Не удалось изменить статью",
+    });
+  }
+};
+export const updateAll = async (req, res) => {
+  try {
+    await PostModel.updateMany(
+      {},
+      {
+        commentsCount: 0,
+      }
+    );
 
+    res.send({
+      success: true,
+    });
+  } catch (err) {
     res.status(500).json({
       message: "Не удалось изменить статью",
     });
