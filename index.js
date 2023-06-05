@@ -33,18 +33,12 @@ app.use(express.json());
 
 app.use("/uploads", express.static("uploads"));
 app.use((req, res, next) => {
-  res.setHeader(
+  res.header(
     "Access-Control-Allow-Origin",
-    "https://blog-front-lilac.vercel.app"
+    process.env.ORIGIN_URL || "https://blog-front-apks86jlt-1doler.vercel.app"
   );
-  res.removeHeader("x-powered-by");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, PATCH"
-  );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-
+  res.header("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE");
+  res.header("Access-Control-Allow-Credentials", "true");
   next();
 });
 
