@@ -81,7 +81,7 @@ export const register = async (req, res) => {
       }
     );
     res.cookie("token", token, {
-      expires: new Date(Date.now() + 900000),
+      expires: new Date(Date.now() + 9000000),
       httpOnly: true,
     });
     const { passwordHash, ...userData } = user._doc;
@@ -119,15 +119,18 @@ export const getProfile = async (req, res) => {
 };
 export const updateProfile = async (req, res) => {
   try {
-    await UserModel.findOneAndUpdate(
+    const data = await UserModel.findOneAndUpdate(
       { _id: req.body.userId },
       {
         fullName: req.body.fullName,
         avatarUrl: req.body.avatarUrl,
       }
     );
-    res.send({
+    const user = await UserModel.findById(req.userId);
+    const { passwordHash, ...userData } = user._doc;
+    res.json({
       success: true,
+      userData,
     });
   } catch (err) {
     res.status(500).json({
