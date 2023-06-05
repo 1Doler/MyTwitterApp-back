@@ -116,6 +116,11 @@ app.post("/upload", checkAuth, upload.single("image"), (req, res) => {
   });
 });
 
+app.get("/auth/logout", (req, res) => {
+  res.clearCookie("token");
+  res.status(200).json({ message: "Токен успешно удален" });
+});
+
 app.listen(process.env.PORT || 4444, err => {
   if (err) {
     return console.log(err);
