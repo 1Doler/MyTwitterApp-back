@@ -70,7 +70,6 @@ app.get("/", (req, res) => {
 //? Запросы на авторизация
 app.post(
   "/auth/login",
-  cors(),
   loginValidation,
   handleValidationError,
   UserController.login
