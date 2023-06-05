@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import multer from "multer";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 import {
   registerValidation,
@@ -41,7 +42,7 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
   next();
 });
-
+app.use(cookieParser());
 app.use(
   cors({
     origin:
@@ -117,7 +118,10 @@ app.post("/upload", checkAuth, upload.single("image"), (req, res) => {
 });
 
 app.get("/auth/logout", (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("token", {
+    sameSite: "none",
+    secure: true,
+  });
   res.status(200).json({ message: "Токен успешно удален" });
 });
 
