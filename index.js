@@ -54,6 +54,14 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(
+  cors({
+    origin: "*",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+  })
+);
+
 const storage = multer.diskStorage({
   destination: (_, __, cb) => {
     cb(null, "uploads");
