@@ -32,12 +32,6 @@ const app = express();
 app.use(express.json());
 
 app.use("/uploads", express.static("uploads"));
-app.use(
-  cors({
-    credentials: true,
-    origin: true,
-  })
-);
 app.use((req, res, next) => {
   res.setHeader(
     "Access-Control-Allow-Origin",
@@ -56,7 +50,9 @@ app.use((req, res, next) => {
 
 app.use(
   cors({
-    origin: "*",
+    origin:
+      process.env.ORIGIN_URL ||
+      "https://blog-front-apks86jlt-1doler.vercel.app",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   })
